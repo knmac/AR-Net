@@ -165,3 +165,4 @@ parser.add_argument('--negative_loss', action='store_true')
 # TODO(yue) Exps/data paths
 parser.add_argument('--data_dir', type=str, default="../../datasets/activity-net-v1.3")
 parser.add_argument('--log_dir', type=str, default="../../logs_tsm")
+parser.add_argument('--remove_missing', default=0, type=bool)

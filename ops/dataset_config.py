@@ -16,10 +16,12 @@ from os.path import join as ospj
 
 def return_actnet(data_dir):
     filename_categories = ospj(data_dir, 'classInd.txt')
-    root_data = data_dir + "/frames"
+    # root_data = data_dir + "/frames"
+    root_data = data_dir + "/frames_256"
     filename_imglist_train = ospj(data_dir, 'actnet_train_split.txt')
     filename_imglist_val = ospj(data_dir, 'actnet_val_split.txt')
-    prefix = 'image_{:05d}.jpg'
+    # prefix = 'image_{:05d}.jpg'
+    prefix = '{:04d}.jpg'
 
     return filename_categories, filename_imglist_train, filename_imglist_val, root_data, prefix
 

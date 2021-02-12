@@ -307,7 +307,8 @@ def main():
                    ada_crop_list=args.ada_crop_list,
                    rescale_to=args.rescale_to,
                    policy_input_offset=args.policy_input_offset,
-                   save_meta=args.save_meta),
+                   save_meta=args.save_meta,
+                   remove_missing=args.remove_missing),
         batch_size=args.batch_size, shuffle=True,
         num_workers=args.workers, pin_memory=True,
         drop_last=True)  # prevent something not % n_GPU
@@ -333,7 +334,8 @@ def main():
                    ada_crop_list=args.ada_crop_list,
                    rescale_to=args.rescale_to,
                    policy_input_offset=args.policy_input_offset,
-                   save_meta=args.save_meta
+                   save_meta=args.save_meta,
+                   remove_missing=args.remove_missing,
                    ),
         batch_size=args.batch_size, shuffle=False,
         num_workers=args.workers, pin_memory=True)

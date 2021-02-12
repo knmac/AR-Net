@@ -46,7 +46,7 @@ class TSNDataSet(data.Dataset):
         self.transform = transform
         self.random_shift = random_shift
         self.test_mode = test_mode
-        self.remove_missing = remove_missing
+        self.remove_missing = bool(remove_missing)
         self.dense_sample = dense_sample  # using dense sample as I3D
         self.twice_sample = twice_sample  # twice sample for more validation
 
@@ -74,7 +74,7 @@ class TSNDataSet(data.Dataset):
         try:
             return [Image.open(os.path.join(self.root_path, directory, self.image_tmpl.format(idx))).convert('RGB')]
         except Exception:
-            print('error loading image:', os.path.join(self.root_path, directory, self.image_tmpl.format(idx)))
+            # print('error loading image:', os.path.join(self.root_path, directory, self.image_tmpl.format(idx)))
             return [Image.open(os.path.join(self.root_path, directory, self.image_tmpl.format(1))).convert('RGB')]
 
     def _parse_list(self):
@@ -177,9 +177,10 @@ class TSNDataSet(data.Dataset):
         err_cnt = 0
         while not os.path.exists(full_path):
             err_cnt += 1
-            if err_cnt > 3:
+            if err_cnt > 3 and not self.remove_missing:
                 exit("Sth wrong with the dataloader to get items. Check your data path. Exit...")
-            print('################## Not Found:', os.path.join(self.root_path, record.path, file_name))
+            if not self.remove_missing:
+                print('################## Not Found:', os.path.join(self.root_path, record.path, file_name))
             index = np.random.randint(len(self.video_list))
             record = self.video_list[index]
             if self.image_tmpl == '{:06d}-{}_{:05d}.jpg':
@@ -198,8 +199,19 @@ class TSNDataSet(data.Dataset):
     def get(self, record, indices):
 
         images = list()
-        for seg_ind in indices:
-            images.extend(self._load_image(record.path, int(seg_ind)))
+        # for seg_ind in indices:
+        #     images.extend(self._load_image(record.path, int(seg_ind)))
+        for i, seg_ind in enumerate(indices):
+            try:
+                images.extend(self._load_image(record.path, int(seg_ind)))
+            except FileNotFoundError:
+                assert i > 0, 'Error reading: {} at {}'.format(record._data, indices)
+                for j in range(i, len(indices)):
+                    indices[j] = indices[i-1]
+                pth = os.path.join(self.visual_path, record.path)
+                record._data[1] = str(len(os.listdir(pth)))
+
+                images.extend(self._load_image(record.path, indices[i-1]))
 
         process_data = self.transform(images)
         if self.ada_reso_skip:
