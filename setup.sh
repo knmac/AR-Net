@@ -2,8 +2,10 @@
 DATA_PTH="/mnt/data0-nfs/shared-datasets/ActivityNet"
 
 # Prepare data
-mkdir data
-ln -s "$DATA_PTH" data
+mkdir -p data
+cd data
+ln -s "$DATA_PTH" ActivityNet
+cp ../data_splits/* ActivityNet
 # Copy actnet_train_split, actnet_val_split, classInd to DATA_PTH
 
 # Prepare pretrained model
