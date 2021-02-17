@@ -6,3 +6,4 @@ model_path
 model_path/
 logs/
 run_docker.sh
+EfficientNet-PyTorch/
