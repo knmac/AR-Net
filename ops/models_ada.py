@@ -1,6 +1,8 @@
+import torch
+import torchvision
 from torch import nn
 from ops.basic_ops import ConsensusModule
-from ops.transforms import *
+from ops.transforms import GroupMultiScaleCrop, GroupRandomHorizontalFlip
 from torch.nn.init import normal_, constant_
 import torch.nn.functional as F
 from efficientnet_pytorch import EfficientNet
