@@ -1,5 +1,5 @@
-GPUS=0  # "0 1 2 3"
-BATCH_SIZE=2  # 48
+GPUS="0 1 2 3"  # "0 1 2 3"
+BATCH_SIZE=48  # 48
 DATA_DIR="./data/ActivityNet"
 LOG_DIR="./logs/logs_tsm"
 REMOVE_MISSING=1

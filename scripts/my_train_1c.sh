@@ -1,5 +1,5 @@
-GPUS=0  # "0 1 2 3"
-BATCH_SIZE=2  # 48
+GPUS="0 1 2 3"  # "0 1 2 3"
+BATCH_SIZE=48  # 48
 DATA_DIR="./data/ActivityNet"
 LOG_DIR="./logs/logs_tsm"
 REMOVE_MISSING=1
@@ -22,7 +22,7 @@ python main_base.py actnet RGB \
     --eval-freq=1 \
     --npb \
     --gpus $GPUS \
-    --exp_header actnet_res18_t16_epo10_112_lr.001 \
+    --exp_header actnet_res18_t16_epo15_112_lr.001 \
     --rescale_to 112 \
     -j 36 \
     --data_dir $DATA_DIR \
