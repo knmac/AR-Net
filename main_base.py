@@ -9,10 +9,12 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
 from torch.nn.utils import clip_grad_norm_
+import numpy as np
+import torchvision
 
 from ops.dataset import TSNDataSet
 from ops.models_ada import TSN_Ada
-from ops.transforms import *
+from ops.transforms import GroupNormalize, Stack, ToTorchFormatTensor, GroupScale, GroupCenterCrop
 from opts import parser
 from ops import dataset_config
 from ops.utils import AverageMeter, accuracy, cal_map, Recorder
@@ -88,7 +90,7 @@ def load_to_sd(model_dict, model_path, module_name, fc_name, resolution, apple_t
 
         if "lite_backbone" in module_name:
             # TODO not loading new_fc in this case, because we are using hidden_dim
-            if args.frame_independent == False:
+            if args.frame_independent is False:
                 del sd["module.lite_fc.weight"]
                 del sd["module.lite_fc.bias"]
         return {k: v for k, v in sd.items() if k in model_dict}
@@ -102,7 +104,7 @@ def main():
     global args, best_prec1, num_class, use_ada_framework  # , model
 
     set_random_seed(args.random_seed)
-    use_ada_framework = args.ada_reso_skip and args.offline_lstm_last == False and args.offline_lstm_all == False and args.real_scsampler == False
+    use_ada_framework = args.ada_reso_skip and args.offline_lstm_last is False and args.offline_lstm_all is False and args.real_scsampler is False
 
     if args.ablation:
         logger = None
@@ -270,7 +272,7 @@ def main():
             model_dict.update(sd)
             model.load_state_dict(model_dict)
 
-    if args.ada_reso_skip == False and args.base_pretrained_from != "":
+    if args.ada_reso_skip is False and args.base_pretrained_from != "":
         print("Baseline: load from pretrained model")
         model_dict = model.state_dict()
         sd = load_to_sd(model_dict, args.base_pretrained_from, "base_model", "new_fc", 224)
@@ -287,7 +289,7 @@ def main():
 
     # Data loading code
     normalize = GroupNormalize(input_mean, input_std)
-    data_length = 1
+    # data_length = 1
     train_loader = torch.utils.data.DataLoader(
         TSNDataSet(args.root_path, args.train_list, num_segments=args.num_segments,
                    image_tmpl=prefix,
@@ -802,8 +804,8 @@ def train(train_loader, model, criterion, optimizer, epoch, logger, exp_full_pat
                             'Loss {loss.val:.4f} ({loss.avg:.4f}) '
                             'Prec@1 {top1.val:.3f} ({top1.avg:.3f}) '
                             'Prec@5 {top5.val:.3f} ({top5.avg:.3f})\t'.format(
-                epoch, i, len(train_loader), batch_time=batch_time,
-                data_time=data_time, loss=losses, top1=top1, top5=top5))  # TODO
+                                epoch, i, len(train_loader), batch_time=batch_time,
+                                data_time=data_time, loss=losses, top1=top1, top5=top5))  # TODO
 
             if use_ada_framework:
                 roh_r = reverse_onehot(r[-1, :, :].detach().cpu().numpy())
@@ -968,8 +970,8 @@ def validate(val_loader, model, criterion, epoch, logger, exp_full_path, tf_writ
                                 'Loss {loss.val:.4f} ({loss.avg:.4f})'
                                 'Prec@1 {top1.val:.3f} ({top1.avg:.3f}) '
                                 'Prec@5 {top5.val:.3f} ({top5.avg:.3f})\t'.format(
-                    i, len(val_loader), batch_time=batch_time, loss=losses,
-                    top1=top1, top5=top5))
+                                    i, len(val_loader), batch_time=batch_time, loss=losses,
+                                    top1=top1, top5=top5))
                 if use_ada_framework:
                     roh_r = reverse_onehot(r[-1, :, :].cpu().numpy())
 
