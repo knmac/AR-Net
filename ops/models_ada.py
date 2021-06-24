@@ -5,7 +5,8 @@ from ops.basic_ops import ConsensusModule
 from ops.transforms import GroupMultiScaleCrop, GroupRandomHorizontalFlip
 from torch.nn.init import normal_, constant_
 import torch.nn.functional as F
-from efficientnet_pytorch import EfficientNet
+# from efficientnet_pytorch import EfficientNet
+from dummy_class import EfficientNet
 from ops.net_flops_table import feat_dim_dict
 
 from torch.distributions import Categorical
